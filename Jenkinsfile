@@ -13,13 +13,19 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
         stage('Install Dependencies') {
+            steps {
+                script {
+                    sh 'pip install -r requirements.txt'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
             steps {
                 script {
                     sh 'docker build -t $APP_NAME .'
                 }
-                sh 'pip install -r requirements.txt'
             }
         }
 
@@ -28,19 +34,14 @@ pipeline {
                 script {
                     sh 'docker run --rm $APP_NAME pytest tests/'
                 }
-                sh 'pytest tests'
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker build -t flask-ci-cd-demo .'
             }
         }
 
         stage('Run Docker Container') {
             steps {
-                sh 'docker run -d -p 5000:5000 --name flask-app flask-ci-cd-demo'
+                script {
+                    sh 'docker run -d -p 5000:5000 --name flask-app $APP_NAME'
+                }
             }
         }
     }
@@ -50,14 +51,10 @@ pipeline {
             echo 'Pipeline finished.'
         }
         success {
-            echo "Build and tests passed!"
-            echo 'Success! App built and tested.'
+            echo 'Build and tests passed!'
         }
         failure {
-            echo "Build or tests failed!"
-            echo 'Build or tests failed.'
+            echo 'Build or tests failed!'
         }
     }
-}
-
 }
