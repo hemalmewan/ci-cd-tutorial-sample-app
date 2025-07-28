@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_BUILDKIT = 1
+        APP_NAME = 'ci-cd-flask-app'
     }
 
     stages {
@@ -12,40 +12,29 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Build Docker Image') {
             steps {
-                sh 'pip install -r requirements.txt'
+                script {
+                    sh 'docker build -t $APP_NAME .'
+                }
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'pytest tests'
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker build -t flask-ci-cd-demo .'
-            }
-        }
-
-        stage('Run Docker Container') {
-            steps {
-                sh 'docker run -d -p 5000:5000 --name flask-app flask-ci-cd-demo'
+                script {
+                    sh 'docker run --rm $APP_NAME pytest tests/'
+                }
             }
         }
     }
 
     post {
-        always {
-            echo 'Pipeline finished.'
-        }
         success {
-            echo 'Success! App built and tested.'
+            echo "Build and tests passed!"
         }
         failure {
-            echo 'Build or tests failed.'
+            echo "Build or tests failed!"
         }
     }
 }
