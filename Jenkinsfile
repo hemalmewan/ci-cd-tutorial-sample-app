@@ -16,7 +16,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build -t $APP_NAME ."
+                    bat "docker build -t $APP_NAME ."
                 }
             }
         }
@@ -25,9 +25,9 @@ pipeline {
             steps {
                 script {
                     // Stop and remove existing container if running (optional)
-                    sh "docker rm -f flask-app || true"
+                    bat "docker rm -f flask-app || true"
                     // Run the app container
-                    sh "docker run -d -p 8000:8000 --name flask-app $APP_NAME"
+                    bat "docker run -d -p 8000:8000 --name flask-app $APP_NAME"
                 }
             }
         }
