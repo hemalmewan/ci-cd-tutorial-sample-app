@@ -2,10 +2,11 @@ from flask import json, jsonify
 from app import app
 from app import db
 from app.models import Menu
+from flask import render_template
 
 @app.route('/')
 def home():
-	return jsonify({ "status": "ok" })
+    return jsonify({ "status": "ok", "message": "Welcome to the Sample App API!" })  # Modified response
 
 @app.route('/menu')
 def menu():
